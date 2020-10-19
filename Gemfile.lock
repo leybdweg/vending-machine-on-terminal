@@ -1,0 +1,15 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    cli-console (0.1.4)
+    highline (2.0.3)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  cli-console
+  highline
+
+BUNDLED WITH
+   2.1.4

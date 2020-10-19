@@ -25,4 +25,16 @@ describe VendingMachine do
       ]
     )
   end
+
+  it 'coke with 1' do
+    expect(
+      vending_machine.buy_product('coke', 1)
+    ).to eq(message: 'not enough money', status: :failed)
+  end
+
+  it 'coke with 3.333' do
+    expect(
+      vending_machine.buy_product('coke', 3.333)
+    ).to eq(message: 'unable to provide correct change', status: :failed)
+  end
 end

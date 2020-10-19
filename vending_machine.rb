@@ -15,7 +15,7 @@ class VendingMachine
     return {status: :failed, message: 'product not available'} unless @products[desired_product_ix]
 
     return {status: :failed, message: 'not enough money'} if @products[desired_product_ix]['price'] > money_inserted
-    return {status: :failed, message: 'unable to provide correct change'} if @products[desired_product_ix]['price'] % @funds_available.last['value'] != 0
+    return {status: :failed, message: 'unable to provide correct change'} if money_inserted % @funds_available.last['value'] != 0
 
     # buy was accepted. If this was db, it'd start a db transaction
 

@@ -14,7 +14,8 @@ describe VendingMachine do
       ]
     )
   end
-it 'coke with 10' do
+
+  it 'coke with 10' do
     expect(
       vending_machine.buy_product('coke', 10)
     ).to eq(

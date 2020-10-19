@@ -5,31 +5,29 @@ class VendingMachine
 
   def initialize
     @products        = YAML.load_file('products.yaml')
-    @funds_available = YAML.load_file('change.yaml').sort { |a, b| a['value'] <=> b['value'] }.reverse
+    @funds_available = YAML.load_file('machine_initial_funds.yaml').sort { |a, b| a['value'] <=> b['value'] }.reverse
     @total_funds     = @funds_available.reduce(0) { |result, current| result + (current['value'] * current['amount']) }
   end
 
-  def buy_product(product_name, money_inserted)
-    desired_product = @products.find { |product| product['name'] == product_name }
-    unless desired_product
-      return { status: :failed, message: 'product not available' }
-    end
+  def buy_product(product_name, money_inserted) #, bills_inserted)
+    # money_inserted = bills_inserted.sum { |bill| bill['amount'] * bill['value']}
+    desired_product_ix = @products.index { |product| product['name'] == product_name }
+    return {status: :failed, message: 'product not available'} unless @products[desired_product_ix]
 
-    if desired_product['price'] > money_inserted
-      return { status: :failed, message: 'not enough money' }
-    end
-    if desired_product['price'] % @funds_available.last['value'] != 0
-      return { status: :failed, message: 'unable to provide correct change' }
-    end
+    return {status: :failed, message: 'not enough money'} if @products[desired_product_ix]['price'] > money_inserted
+    return {status: :failed, message: 'unable to provide correct change'} if @products[desired_product_ix]['price'] % @funds_available.last['value'] != 0
 
+    # buy was accepted. If this was db, it'd start a db transaction
 
-    @products.delete { |product| product['name'] == product_name }
+    # remove if it's the last item
+    @products[desired_product_ix]['amount'] == 1 ? @products.delete_at(desired_product_ix) : @products[desired_product_ix]['amount'] -= 1
 
-    change_yet_to_be_given = money_inserted - desired_product['value']
+    # compute change and deduce from retained funds
+    change_yet_to_be_given = money_inserted - @products[desired_product_ix]['price']
     final_change = []
     @funds_available.each do |coin|
-      money_in_this_value = change_yet_to_be_given / coin['value']
-      amount = money_in_this_value.to_i < coin['amount'] ? money_in_this_value.to_i : coin['amount']
+      bills_to_be_deduced = change_yet_to_be_given / coin['value']
+      amount = bills_to_be_deduced.to_i < coin['amount'] ? bills_to_be_deduced.to_i : coin['amount']
       change_yet_to_be_given -= amount * coin['value']
       if amount.positive?
         final_change.push(coin: coin['value'], amount: amount)
@@ -39,6 +37,7 @@ class VendingMachine
       break if change_yet_to_be_given.zero?
     end
 
+    final_change
   end
 
 end

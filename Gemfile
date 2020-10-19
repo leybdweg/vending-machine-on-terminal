@@ -3,5 +3,8 @@
 
 source 'https://rubygems.org'
 
-gem 'cli-console'
-gem 'highline'
+gem 'cli-console', '0.1.4'
+gem 'highline', '2.0.3'
+gem 'rspec', '3.9.0'
+gem 'rspec-core', '3.9.2'
+gem 'rspec-expectations', '3.9.2'

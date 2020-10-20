@@ -44,7 +44,6 @@ class VendingMachine
       break if change_yet_to_be_given.zero?
     end
 
-    # TODO: inserted money not being adding up to balance
     { status: :success, message: final_change_to_s(final_change) }
   end
 

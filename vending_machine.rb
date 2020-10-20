@@ -26,13 +26,12 @@ class VendingMachine
       @funds_available.find { |money| money.value == bill}.amount += 1
     end
 
-    # remove if it's the last item
-    @products[desired_product_ix].item_amount == 1 ? @products.delete_at(desired_product_ix) : @products[desired_product_ix].item_amount -= 1
-
     # compute change and deduce from retained funds
     change_yet_to_be_given = all_money_inserted - @products[desired_product_ix].item_price
     final_change           = []
     @funds_available.each do |coin|
+      # next if coin.amount.zero?
+
       bills_to_be_deduced    = change_yet_to_be_given / coin.value
       amount                 = bills_to_be_deduced.to_i < coin.amount ? bills_to_be_deduced.to_i : coin.amount
       change_yet_to_be_given -= amount * coin.value
@@ -41,8 +40,16 @@ class VendingMachine
         coin.amount -= amount
       end
 
+
       break if change_yet_to_be_given.zero?
+      if coin.value == @funds_available.last.value
+        # if this was a db, a rollback would be in place
+        raise 'Not enough change for operation'
+      end
     end
+
+    # remove if it's the last item
+    @products[desired_product_ix].item_amount == 1 ? @products.delete_at(desired_product_ix) : @products[desired_product_ix].item_amount -= 1
 
     { status: :success, message: final_change_to_s(final_change) }
   end

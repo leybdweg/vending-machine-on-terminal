@@ -3,6 +3,29 @@
 require_relative '../vending_machine'
 
 describe VendingMachine do
+  it 'coke with 4.75' do
+    expect(
+      subject.buy_product('coke', 4.75)
+    ).to eq(
+      [
+        { coin: 1, amount: 1 },
+        { coin: 0.50, amount: 1 },
+        { coin: 0.25, amount: 1 }
+      ]
+    )
+  end
+
+  it 'coke with 4.25' do
+    expect(
+      subject.buy_product('coke', 4.25)
+    ).to eq(
+      [
+        { coin: 1, amount: 1 },
+        { coin: 0.25, amount: 1 }
+      ]
+    )
+  end
+
   it 'coke with 5.25' do
     expect(
       subject.buy_product('coke', 5.25)

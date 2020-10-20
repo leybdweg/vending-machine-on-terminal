@@ -42,6 +42,16 @@ class VendingMachine
       break if change_yet_to_be_given.zero?
     end
 
-    final_change
+    # TODO: inserted money not being adding up to balance
+    final_change_to_s(final_change)
+  end
+
+  def products
+    @products.map { |item| "#{item.item_name} - $#{item.item_price}"}
+  end
+
+  def final_change_to_s(final_change)
+    str = "Here's your change: \n"
+    str + final_change.map { |change| "#{change[:amount]} of $#{change[:coin]}"}.join("\n")
   end
 end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'spec_helper'
-require_relative '../vending_machine'
+require_relative '../models/vending_machine'
 
 describe VendingMachine do
   context 'success flow' do

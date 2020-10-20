@@ -7,8 +7,8 @@ class VendingMachine
   # include ItemManager
 
   def initialize
-    @products        = YAML.load_file('products.yaml').map { |item| ItemManager.new(item['name'], item['price'], item['amount']) }
-    @funds_available = YAML.load_file('machine_initial_funds.yaml')
+    @products        = YAML.load_file('seed/products.yaml').map { |item| ItemManager.new(item['name'], item['price'], item['amount']) }
+    @funds_available = YAML.load_file('seed/machine_initial_funds.yaml')
                            .sort { |a, b| a['value'] <=> b['value'] }.reverse
                            .map { |bill| Money.new(bill['amount'], bill['value']) }
   end

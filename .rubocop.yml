@@ -1,0 +1,8 @@
+Metrics/LineLength:
+  Max: 130
+Style/Documentation:
+  Enabled: false
+Style/RescueStandardError:
+  Enabled: false
+Style/BracesAroundHashParameters:
+  EnforcedStyle: context_dependent

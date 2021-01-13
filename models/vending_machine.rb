@@ -33,7 +33,6 @@ class VendingMachine
     change_yet_to_be_given = all_money_inserted - @products[product_name].item_price
     final_change           = []
     @funds_available.each do |coin|
-      # next if coin.amount.zero?
 
       bills_to_be_deduced    = change_yet_to_be_given / coin.value
       amount                 = bills_to_be_deduced.to_i < coin.amount ? bills_to_be_deduced.to_i : coin.amount

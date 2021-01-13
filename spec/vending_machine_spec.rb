@@ -52,7 +52,7 @@ describe VendingMachine do
       end
 
       it 'martini with 10' do
-        subject.instance_variable_set(:@products, [ItemManager.new('martini', 9.75, 1)])
+        subject.instance_variable_set(:@products, 'martini' => ItemManager.new('martini', 9.75, 1))
         subject.instance_variable_set(:@funds_available, [Money.new(2, 5)])
 
         expect { subject.buy_product('martini', [5, 5]) }.to raise_error(RuntimeError)
@@ -61,7 +61,7 @@ describe VendingMachine do
   end
 
   context 'item managing' do
-    let(:mate) { subject.instance_variable_get(:@products).find { |product| product.item_name == 'mate'} }
+    let(:mate) { subject.products['mate'] }
 
     it 'item was reduced after buying' do
       original_mate_amount = mate.item_amount
@@ -71,16 +71,16 @@ describe VendingMachine do
 
     it 'item out of stock after last buy - all bought' do
       mate.item_amount.times { subject.buy_product('mate', [2, 0.5]) }
-      expect(subject.instance_variable_get(:@products).find { |product| product.item_name == 'mate'}).to be_nil
+      expect(subject.products['mate']).to be_nil
     end
     it 'item N/A - should have been checked before trying to buy' do
-      expect { subject.buy_product('N/A', [2, 0.5]) }.to raise_exception(TypeError, 'no implicit conversion from nil to integer')
+      expect(subject.buy_product('N/A', [2, 0.5])).to eq(status: :failed, message: 'product not available')
     end
   end
 
   context 'funds properly changing' do
     let(:funds) { subject.instance_variable_get(:@funds_available) }
-    let(:beer) { subject.instance_variable_get(:@products).find { |product| product.item_name == 'beer'} }
+    let(:beer) { subject.products('beer') }
 
     it 'money being added - exact value' do
       original_funds = funds.sum { |money| money.value * money.amount}

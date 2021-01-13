@@ -51,7 +51,11 @@ class VendingMachine
     end
 
     # remove if it's the last item
-    @products[product_name].item_amount == 1 ? @products.delete(product_name) : @products[product_name].item_amount -= 1
+    if @products[product_name].item_amount == 1
+      @products.delete(product_name)
+    else
+      @products[product_name].item_amount -= 1
+    end
 
     { status: :success, message: final_change_to_s(final_change) }
   end
@@ -69,7 +73,7 @@ class VendingMachine
   def final_change_to_s(final_change)
     return '' if final_change.empty?
 
-    str = "Here's your change: \n"
-    str + final_change.map { |change| "#{change[:amount]} of $#{change[:coin]}"}.join("\n")
+    change_str = final_change.map { |change| "#{change[:amount]} coin(s) of $#{change[:coin]}"}.join("\n")
+    "Here's your change: \n" + change_str
   end
 end

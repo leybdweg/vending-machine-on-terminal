@@ -7,12 +7,16 @@ class VendingMachineUI
     @money_in_progress = []
   end
 
+  def items_text
+    @vending_machine.products.map { |_key, item| "#{item.item_name} - $#{item.item_price}" }.join("\n")
+  end
+
   def offer_items
     puts "\n"
     puts 'Choose which product you want or exit to leave'.blue.on_light_black
-    item_chosen = @console.getCommand(@vending_machine.products.join("\n"))
+    item_chosen = @console.getCommand(items_text)
     exit if item_chosen == 'exit'
-    return puts 'Product N/A'.black.on_white unless @vending_machine.product(item_chosen)
+    return puts 'Product N/A'.black.on_white unless @vending_machine.products[item_chosen]
 
     puts 'Please insert money in one of these formats: '
     ask_for_more_money(item_chosen)

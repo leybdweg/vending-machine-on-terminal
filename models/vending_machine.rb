@@ -4,21 +4,24 @@ require_relative 'item_manager'
 require_relative 'money'
 
 class VendingMachine
-  # include ItemManager
+
+  attr_reader :products
 
   def initialize
-    @products        = YAML.load_file('seed/products.yaml').map { |item| ItemManager.new(item['name'], item['price'], item['amount']) }
+    @products = {}
+    YAML.load_file('seed/products.yaml').each do |item|
+      @products[item['name']] = ItemManager.new(item['name'], item['price'], item['amount'])
+    end
     @funds_available = YAML.load_file('seed/machine_initial_funds.yaml')
-                           .sort { |a, b| a['value'] <=> b['value'] }.reverse
+                           .sort_by { |a| a['value'] }.reverse # strangely, it's the fastest approach
                            .map { |bill| Money.new(bill['amount'], bill['value']) }
   end
 
   def buy_product(product_name, bills_inserted)
     all_money_inserted = bills_inserted.sum
-    desired_product_ix = @products.index { |item| item.item_name == product_name }
-    return {status: :failed, message: 'product not available'} unless @products[desired_product_ix]
+    return {status: :failed, message: 'product not available'} unless @products[product_name]
 
-    return {status: :failed, message: 'not enough money'} if @products[desired_product_ix].item_price > all_money_inserted
+    return {status: :failed, message: 'not enough money'} if @products[product_name].item_price > all_money_inserted
     return {status: :failed, message: 'unable to provide correct change'} if all_money_inserted % @funds_available.last.value != 0
 
     # buy was accepted. If this was db, it'd start a db transaction
@@ -27,7 +30,7 @@ class VendingMachine
     end
 
     # compute change and deduce from retained funds
-    change_yet_to_be_given = all_money_inserted - @products[desired_product_ix].item_price
+    change_yet_to_be_given = all_money_inserted - @products[product_name].item_price
     final_change           = []
     @funds_available.each do |coin|
       # next if coin.amount.zero?
@@ -49,17 +52,9 @@ class VendingMachine
     end
 
     # remove if it's the last item
-    @products[desired_product_ix].item_amount == 1 ? @products.delete_at(desired_product_ix) : @products[desired_product_ix].item_amount -= 1
+    @products[product_name].item_amount == 1 ? @products.delete(product_name) : @products[product_name].item_amount -= 1
 
     { status: :success, message: final_change_to_s(final_change) }
-  end
-
-  def products
-    @products.map { |item| "#{item.item_name} - $#{item.item_price}"}
-  end
-
-  def product(item_name)
-    @products.find { |item| item.item_name == item_name}
   end
 
   def coins_accepted
@@ -67,10 +62,7 @@ class VendingMachine
   end
 
   def enough_money_to_buy_product?(product_name, money)
-    product_found = product(product_name)
-    return unless product_found
-
-    product_found.item_price <= money
+    @products[product_name] && @products[product_name].item_price <= money
   end
 
   private

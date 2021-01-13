@@ -1,8 +1,10 @@
 # instructions
 
 ruby 2.5+
+bundler
 
 # how to run
 
-ruby vending_machine_init.rb 
+- bundle install
+- ruby vending_machine_init.rb 
 
